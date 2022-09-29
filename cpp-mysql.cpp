@@ -10,30 +10,29 @@ int main()
 	int qstate;
 	const char* za;
 	
-
 	MYSQL* conn; /* pointer to connection handler */
 	MYSQL_ROW row;
 	MYSQL_RES *res; /* holds the result set */
 	conn = mysql_init(NULL);/* INITIALIZE CONNECTION HANDLER, DO NOT CHANGE */
 	conn = mysql_real_connect(conn, "localhost", "root", "Koperek28", "testdb", 3306, NULL, 0);/* THIS CONNECTS TO SERVER, */
-
-	signed short int wybor;
+										 // change "Koperek28" to your password and "testdb" to your db name
+	signed short int choice;
 	string id;
 	string name;
-	string zapytanie;
+	string quer;
 	string score;
 	string del;
+	//clearing strings to help later with looping main();
 	id.clear();
 	name.clear();
-	zapytanie.clear();
+	quer.clear();
 	score.clear();
 	score.clear();
 	del.clear();
 
-
 	cout << "1. insert" << endl << "2. view" << endl << "3. delete" << endl << "4. custom query" << endl << "5. clear console" << endl << "6. exit" << endl;
-	cin >> wybor;
-	switch (wybor)
+	cin >> choice;
+	switch (choice)
 	{
 	case 1:
 		cout << "id:";
@@ -41,10 +40,10 @@ int main()
 		cout << "name:";
 		cin >> name;
 		cout << "score:";
-		cin >> score;
-		zapytanie = "INSERT INTO test (id, name, score) VALUES (" + id + ", '" + name + "', " + score + ");";
-		cout << zapytanie << endl;
-		za = zapytanie.c_str();
+		cin >> score;	//change values to matching your table
+		quer = "INSERT INTO test (id, name, score) VALUES (" + id + ", '" + name + "', " + score + ");";
+		cout << quer << endl;
+		za = quer.c_str();
 			mysql_query(conn, za);
 			cout << mysql_error(conn);
 			cout << endl;
@@ -53,7 +52,7 @@ int main()
 	case 2:
 		if (conn)
 		{
-			string query = "SELECT * FROM test";
+			string query = "SELECT * FROM test"; // change test for your table name
 			const char* q = query.c_str();
 			qstate = mysql_query(conn, q);
 			if (!qstate)
@@ -74,56 +73,70 @@ int main()
 		}
 		else
 		{
-			puts("fail");
+			puts("failed to connect to db");
 			cout << endl;
-			
 		}
 		main();
 		break;
 	case 3:
-		cout << "DELETE FROM test WHERE " << endl;
-		cin.ignore();
-		getline(cin, del); // type without using space
-		zapytanie = "DELETE FROM test WHERE " + del; 
-		cout << zapytanie<<endl;
-		za = zapytanie.c_str();
-		qstate = mysql_query(conn, za);
-		if (!qstate)
+		if (conn)
 		{
-			mysql_query(conn, za);
-			cout << mysql_error(conn);
-			cout << endl;
-			main();
+			cout << "DELETE FROM test WHERE " << endl;
+			cin.ignore();
+			getline(cin, del); // example: id = 5;
+			quer = "DELETE FROM test WHERE " + del;
+			cout << quer << endl;
+			za = quer.c_str();
+			qstate = mysql_query(conn, za);
+			if (!qstate)
+			{
+				mysql_query(conn, za);
+				cout << mysql_error(conn);
+				cout << endl;
+				main();
+			}
+			else
+			{
+				cout << "failed quary: " << mysql_error(conn) << endl;
+				cout << endl;
+				main();
+			}
+			break;
 		}
 		else
 		{
-			cout << "failed quary: " << mysql_error(conn) << endl;
+			puts("failed to connect to db");
 			cout << endl;
-			main();
 		}
-		break;
 	case 4:
-		cout << "write querry: " << endl; //select deos not work here
-		cin.ignore();
-		getline(cin, zapytanie);
-		cout << zapytanie << endl;
-		za = zapytanie.c_str();
-		qstate = mysql_query(conn, za);
-		if (!qstate)
+		if (conn)
 		{
-			mysql_query(conn, za);
-			cout << mysql_error(conn) << endl;
-			cout << endl;
-			main();
+			cout << "write querry: " << endl; //select deos not work here
+			cin.ignore();
+			getline(cin, quer);
+			cout << quer << endl;
+			za = quer.c_str();
+			qstate = mysql_query(conn, za);
+			if (!qstate)
+			{
+				mysql_query(conn, za);
+				cout << mysql_error(conn) << endl;
+				cout << endl;
+				main();
+			}
+			else
+			{
+				cout << "failed quary: " << mysql_error(conn) << endl;
+				cout << endl;
+				main();
+			}
+			break;
 		}
 		else
 		{
-			cout << "failed quary: " << mysql_error(conn) << endl;
+			puts("failed to connect to db");
 			cout << endl;
-			main();
-			
 		}
-		break;
 	case 5:
 		system("cls");
 		main();
@@ -135,7 +148,6 @@ int main()
 	default:
 		break;
 	}
-
 	mysql_close(conn);
 return 0;
 }
