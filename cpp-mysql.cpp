@@ -14,8 +14,8 @@ int main()
 	MYSQL_ROW row;
 	MYSQL_RES *res; /* holds the result set */
 	conn = mysql_init(NULL);/* INITIALIZE CONNECTION HANDLER, DO NOT CHANGE */
-	conn = mysql_real_connect(conn, "localhost", "root", "Koperek28", "testdb", 3306, NULL, 0);/* THIS CONNECTS TO SERVER, */
-										 // change "Koperek28" to your password and "testdb" to your db name
+	conn = mysql_real_connect(conn, "localhost", "root", "", "testdb", 3306, NULL, 0);/* THIS CONNECTS TO SERVER, */
+										 // change "testdb" to your db name
 	signed short int choice;
 	string id;
 	string name;
