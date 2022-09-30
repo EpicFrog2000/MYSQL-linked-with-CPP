@@ -2,13 +2,13 @@
 #include <iostream>
 #include <string>
 #include <iostream>
-#include <sstream>
 using namespace std;
-
+string Tname = "test";
 int main()
 {	
 	int qstate;
 	const char* za;
+	
 	
 	MYSQL* conn; /* pointer to connection handler */
 	MYSQL_ROW row;
@@ -22,6 +22,12 @@ int main()
 	string quer;
 	string score;
 	string del;
+	string NewTableName;
+	string column;
+	string datatype;
+	string values;
+	string variables;
+	
 	//clearing strings to help later with looping main();
 	id.clear();
 	name.clear();
@@ -29,19 +35,52 @@ int main()
 	score.clear();
 	score.clear();
 	del.clear();
-
-	cout << "1. insert" << endl << "2. view" << endl << "3. delete" << endl << "4. custom query" << endl << "5. clear console" << endl << "6. exit" << endl;
+	NewTableName.clear();
+	datatype.clear();
+	column.clear();
+	values.clear();
+	variables.clear();
+	//XD
+	cout << "0. show databases" << endl << "1.switch table ('test' is set by default)" << endl << "2. insert to table" << endl <<
+		"3. viev all in table" << endl << "4. delete from table" << endl << "5. custom query" << endl << "6. clear console" <<
+		endl << "7. exit" << endl << "8. add table to db" << endl << "9. viev all tables" << endl <<
+		"10. alter table" << endl;
+	// Just use option 5 xd
 	cin >> choice;
 	switch (choice)
 	{
+	case 0:
+		quer = "SHOW DATABASES;";
+		za = quer.c_str();
+		mysql_query(conn, za);
+		cout << mysql_error(conn) << endl;
+		cout << endl;
+		res = mysql_store_result(conn);
+		cout << "DATABASES: " << endl;
+		cout << "+-----------------------" << endl;
+		while (row = mysql_fetch_row(res))
+		{
+			cout << "| " << *row << endl;
+			cout << "+-----------------------" << endl;
+		}
+		main();
+		break;
 	case 1:
-		cout << "id:";
-		cin >> id;
-		cout << "name:";
-		cin >> name;
-		cout << "score:";
-		cin >> score;	//change values to matching your table
-		quer = "INSERT INTO test (id, name, score) VALUES (" + id + ", '" + name + "', " + score + ");";
+		cout << "current table: "+Tname << endl;
+		cout << "type in table name: " << endl;
+		cin >> Tname;
+		cout << endl;
+		cin.ignore();
+		main();
+		break;
+	case 2:
+		cout << "Enter table name";
+		cin >> Tname;
+		cout << "values:";
+		cin >> values;
+		cout << "variables:";
+		cin >> variables;
+		quer = "INSERT INTO " + Tname + " ("+values+") VALUES (" + variables + ");";
 		cout << quer << endl;
 		za = quer.c_str();
 			mysql_query(conn, za);
@@ -49,10 +88,10 @@ int main()
 			cout << endl;
 			main();
 		break;
-	case 2:
+	case 3:
 		if (conn)
 		{
-			string query = "SELECT * FROM test"; // change test for your table name
+			string query = "SELECT * FROM "+ Tname; // change test for your table name
 			const char* q = query.c_str();
 			qstate = mysql_query(conn, q);
 			if (!qstate)
@@ -78,13 +117,13 @@ int main()
 		}
 		main();
 		break;
-	case 3:
+	case 4:
 		if (conn)
 		{
-			cout << "DELETE FROM test WHERE " << endl;
+			cout << "DELETE FROM " + Tname + " WHERE " << endl;
 			cin.ignore();
 			getline(cin, del); // example: id = 5;
-			quer = "DELETE FROM test WHERE " + del;
+			quer = "DELETE FROM " + Tname + " WHERE " + del;
 			cout << quer << endl;
 			za = quer.c_str();
 			qstate = mysql_query(conn, za);
@@ -108,7 +147,7 @@ int main()
 			puts("failed to connect to db");
 			cout << endl;
 		}
-	case 4:
+	case 5:
 		if (conn)
 		{
 			cout << "write querry: " << endl; //select deos not work here
@@ -116,20 +155,10 @@ int main()
 			getline(cin, quer);
 			cout << quer << endl;
 			za = quer.c_str();
-			qstate = mysql_query(conn, za);
-			if (!qstate)
-			{
 				mysql_query(conn, za);
 				cout << mysql_error(conn) << endl;
 				cout << endl;
 				main();
-			}
-			else
-			{
-				cout << "failed quary: " << mysql_error(conn) << endl;
-				cout << endl;
-				main();
-			}
 			break;
 		}
 		else
@@ -137,14 +166,68 @@ int main()
 			puts("failed to connect to db");
 			cout << endl;
 		}
-	case 5:
+	case 6:
 		system("cls");
 		main();
 		break;
-	case 6:
+	case 7:
 		return 0;
 		break;
+	case 8:
+		cout << "Enter New table name: " << endl;
+		cin >> NewTableName;
+		cout << "Enter New column name: " << endl;
+		cin >> column;
+		cout << "Enter New datatype name: " << endl;
+		cin >> datatype;
+		quer = "CREATE TABLE " + NewTableName + "(" + column + " " + datatype+ " );";
+		cout << quer << endl;
+		za = quer.c_str();
+		mysql_query(conn, za);
+		cout << mysql_error(conn);
+		cout << endl;
+		main();
+		break;
+	case 9:
+		quer = "SHOW TABLES;";
+		cout << quer << endl;
+		za = quer.c_str();
+		mysql_query(conn, za);
+		cout << mysql_error(conn);
+		cout << endl;
+		res = mysql_store_result(conn);
+		cout << "TABLES: " << endl;
+		cout << "+-----------------------" << endl;
+		while (row = mysql_fetch_row(res))
+		{
+			cout << "| " << *row << endl;
+			cout << "+-----------------------" << endl;
+		}
+		main();
+		break;
 
+	case 10:
+		if (conn)
+		{
+			cout << "ALTER TABLE " << endl; //select deos not work here
+			cin.ignore();
+			getline(cin, quer);
+			quer = "ALTER TABLE " + quer;
+			cout << quer << endl;
+			za = quer.c_str();
+				mysql_query(conn, za);
+				cout << mysql_error(conn) << endl;
+				cout << endl;
+				main();
+
+			break;
+		}
+		else
+		{
+			puts("failed to connect to db");
+			cout << endl;
+		}
+		break;
 	default:
 		break;
 	}
